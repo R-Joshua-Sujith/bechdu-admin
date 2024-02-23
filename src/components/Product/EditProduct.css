@@ -1,0 +1,45 @@
+.view
+
+.edit-product-container{
+    display: flex;
+    gap:50px;
+}
+
+.add-product-container{
+    display: flex;
+    gap:0px;
+    padding-bottom: 50px;
+
+}
+
+.variants-container{
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 20px;
+    margin-top: 10px;
+}
+
+.add-product-main-container{
+    width: 100%;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    border-radius: 20px;
+
+}
+
+.add-product-options-container{
+    display: flex;
+    justify-content:flex-start;
+    flex-wrap: wrap;
+    gap:20px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    width: 100%;
+    border-radius: 20px;
+}
+
+.single-option-container{
+    width: max-content;
+    display: flex;
+    gap:10px;
+}

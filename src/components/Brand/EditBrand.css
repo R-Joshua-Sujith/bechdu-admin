@@ -1,0 +1,15 @@
+.series-model-container{
+    box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+.add-brand-series{
+
+    box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 10px 8px 38px 0px rgba(0, 0, 0, 0.10);
+
+    padding: 20px;
+    padding-top: 40px;
+    border-radius: 20px;
+
+}

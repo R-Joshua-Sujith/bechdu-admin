@@ -1,0 +1,29 @@
+.section-container{
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: max-content;
+    border-radius: 20px;
+  }
+  
+  .arrow-up-down-container{
+    margin-left: 10px;
+    display: inline-flex;
+    gap:10px; 
+  }
+
+  .section-sub-container{
+    margin-top: 20px;
+  }
+
+    
+  .option-container{
+    margin-bottom: 10px;
+  }
+  
+  .category-create-button{
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+  }

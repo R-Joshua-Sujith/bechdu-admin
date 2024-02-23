@@ -1,0 +1,21 @@
+.add-brand-container{
+    display: flex;
+    gap:50px;
+}
+
+.add-brand-main-container{
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+.options-container{
+    display: flex;
+    flex-direction: column;
+    gap:50px;
+    margin-bottom: 50px;
+}
+
+.add-brand-series{
+    margin-bottom: 20px;
+}

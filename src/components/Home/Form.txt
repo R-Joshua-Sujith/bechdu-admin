@@ -1,0 +1,247 @@
+import React, { useState } from "react";
+import { createCategory, uploadImage } from "./api";
+import "./Form.css";
+const Form = () => {
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sections, setSections] = useState([
+    {
+      heading: "",
+      type: "yes/no",
+      options: [{ description: "", type: "", image: null }],
+      sectionCriteria: "none",
+    },
+    {
+      heading: "",
+      type: "image",
+      options: [{ description: "", type: "", image: null }],
+      sectionCriteria: "none",
+    },
+    {
+      heading: "",
+      type: "grid",
+      options: [{ description: "", type: "", image: null }],
+      sectionCriteria: "none",
+    },
+  ]);
+  const [imageFiles, setImageFiles] = useState([]);
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleAddSection = () => {
+    setSections([
+      ...sections,
+      { heading: "", type: "", options: [], sectionCriteria: "none" },
+    ]);
+  };
+
+  const handleSectionCriteriaChange = (index, criteria) => {
+    const updatedSections = [...sections];
+    updatedSections[index].sectionCriteria = criteria;
+    setSections(updatedSections);
+  };
+
+  const handleSectionTypeChange = (index, type) => {
+    const updatedSections = [...sections];
+    updatedSections[index].type = type;
+    setSections(updatedSections);
+  };
+
+  const handleSectionHeadingChange = (index, heading) => {
+    const updatedSections = [...sections];
+    updatedSections[index].heading = heading;
+    setSections(updatedSections);
+  };
+
+  const handleDeleteSection = (index) => {
+    const updatedSections = [...sections];
+    updatedSections.splice(index, 1);
+    setSections(updatedSections);
+  };
+
+  const handleAddOption = (sectionIndex) => {
+    const updatedSections = [...sections];
+    const option = { description: "", type: "", image: null };
+    updatedSections[sectionIndex].options.push(option);
+    setSections(updatedSections);
+  };
+
+  const handleDeleteOption = (sectionIndex, optionIndex) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex].options.splice(optionIndex, 1);
+    setSections(updatedSections);
+  };
+
+  const handleOptionChange = (sectionIndex, optionIndex, field, value) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex].options[optionIndex][field] = value;
+    setSections(updatedSections);
+  };
+
+  const handleImageChange = (sectionIndex, optionIndex, e) => {
+    const updatedSections = [...sections];
+    const file = e.target.files[0];
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updatedSections[sectionIndex].options[optionIndex].image = reader.result;
+      setSections(updatedSections);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = async (file, index) => {
+    try {
+      const filename = await uploadImage(file);
+      const updatedImageFiles = [...imageFiles];
+      updatedImageFiles[index] = filename;
+      setImageFiles(updatedImageFiles);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+  const handleCreate = () => {
+    console.log(sections);
+  };
+
+  return (
+    <div className="category-form-container">
+      <label>
+        Category Name:
+        <input
+          type="text"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          placeholder="Enter Category Name"
+        />
+      </label>
+      <br />
+      <button onClick={handleAddSection}>Add Section</button>
+      <br />
+      {sections.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="section-container">
+          <label>
+            Section Heading:
+            <input
+              type="text"
+              value={section.heading}
+              onChange={(e) =>
+                handleSectionHeadingChange(sectionIndex, e.target.value)
+              }
+              placeholder="Enter Section Heading"
+            />
+          </label>
+          <label>
+            Section Type:
+            <select
+              value={section.type}
+              onChange={(e) =>
+                handleSectionTypeChange(sectionIndex, e.target.value)
+              }
+            >
+              <option value="">Select Section Type</option>
+              <option value="yes/no">yes/no</option>
+              <option value="grid">grid</option>
+              <option value="image">image</option>
+            </select>
+          </label>
+          <label>
+            Section Criteria:
+            <select
+              value={section.sectionCriteria}
+              onChange={(e) =>
+                handleSectionCriteriaChange(sectionIndex, e.target.value)
+              }
+            >
+              <option value="all">all</option>
+              <option value="one">one</option>
+              <option value="some">some</option>
+              <option value="none">none</option>
+            </select>
+          </label>
+
+          <button onClick={() => handleDeleteSection(sectionIndex)}>
+            Delete Section
+          </button>
+          <br />
+          {section.type && (
+            <div>
+              <button onClick={() => handleAddOption(sectionIndex)}>
+                Add Option
+              </button>
+              {section.options.map((option, optionIndex) => (
+                <div key={optionIndex} className="option-container">
+                  <label>
+                    Option Description:
+                    <input
+                      type="text"
+                      value={option.description}
+                      onChange={(e) =>
+                        handleOptionChange(
+                          sectionIndex,
+                          optionIndex,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Option Type:
+                    <select
+                      value={option.type}
+                      onChange={(e) =>
+                        handleOptionChange(
+                          sectionIndex,
+                          optionIndex,
+                          "type",
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option value="">Select Option Type</option>
+                      <option value="add">Add</option>
+                      <option value="sub">Subtract</option>
+                    </select>
+                  </label>
+                  {section.type === "image" && (
+                    <label>
+                      Image:
+                      <input
+                        type="file"
+                        onChange={(e) =>
+                          handleImageChange(sectionIndex, optionIndex, e)
+                        }
+                      />
+                      {option.image && (
+                        <img src={option.image} alt="Preview" width="50" />
+                      )}
+                    </label>
+                  )}
+                  <button
+                    onClick={() =>
+                      handleDeleteOption(sectionIndex, optionIndex)
+                    }
+                  >
+                    Delete Option
+                  </button>
+                  <br />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+      <button onClick={handleCreate} className="category-create-button">
+        Create
+      </button>
+    </div>
+  );
+};
+
+export default Form;

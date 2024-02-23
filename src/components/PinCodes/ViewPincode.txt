@@ -1,0 +1,288 @@
+import React from "react";
+import "./ViewPinCode.css";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Pagination } from "@mui/material";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import { useNavigate } from "react-router-dom";
+import { Modal, Typography } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Navigation } from "@mui/icons-material";
+import Nav from "../Repeatable/Nav";
+import ColumnToggleDropdown from "../Repeatable/ColumnToggleDropdown";
+import SearchIcon from "@mui/icons-material/Search";
+
+const DeleteConfirmationModal = ({ isOpen, handleClose, handleDelete }) => {
+  return (
+    <Modal open={isOpen} onClose={handleClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 300,
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography variant="h6" component="div" gutterBottom>
+          Are you sure you want to delete?
+        </Typography>
+        <Button onClick={handleDelete} variant="contained" sx={{ mr: 2 }}>
+          Yes
+        </Button>
+        <Button onClick={handleClose} variant="contained">
+          No
+        </Button>
+      </Box>
+    </Modal>
+  );
+};
+
+const ViewPinCode = () => {
+  const apiURL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate("");
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalRows, setTotalRows] = useState(0);
+  const savedColumns = localStorage.getItem("pincodes");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleColumns, setVisibleColumns] = useState(
+    savedColumns
+      ? JSON.parse(savedColumns)
+      : {
+          stateName: true,
+          city: true,
+          actions: true,
+        }
+  );
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    isOpen: false,
+    categoryId: null,
+  });
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${apiURL}/pincode/get-all-pincodes?page=${currentPage}&pageSize=${pageSize}`
+      );
+      console.log(response.data);
+      setData(response.data.data);
+      setTotalRows(response.data.totalRows);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, pageSize, searchQuery]);
+
+  const updateUrl = ({ page, pageSize }) => {
+    const newUrl = `?page=${page}&pageSize=${pageSize}`;
+    window.history.pushState({}, "", newUrl);
+  };
+
+  const handleSearchInputChange = (event) => {
+    setSearchQuery(event.target.value);
+    setCurrentPage(1);
+    updateUrl({ page: 1, pageSize });
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+    updateUrl({ page: newPage, pageSize });
+  };
+
+  const handlePageSizeSelectChange = (event) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to page 1 when changing page size
+    updateUrl({ page: 1, pageSize: newPageSize });
+  };
+
+  const columns = [
+    {
+      field: "stateName",
+      headerName: "State",
+      visible: visibleColumns.stateName,
+    },
+    {
+      field: "cityName",
+      headerName: "City",
+      visible: visibleColumns.city,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      visible: visibleColumns.actions,
+    },
+  ];
+
+  const deletePincode = (id) => {
+    setDeleteConfirmation({ isOpen: true, pincodeId: id });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const id = deleteConfirmation.pincodeId;
+      await axios
+        .delete(`${apiURL}/pincode/delete-pincode/${id}`)
+        .then((res) => {
+          toast.info(res.data.message);
+          setDeleteConfirmation({ isOpen: false, pincodeId: null });
+          fetchData();
+        });
+    } catch (err) {
+      setDeleteConfirmation({ isOpen: false, pincodeId: null });
+      toast.error(err.response.data.error);
+    }
+  };
+
+  return (
+    <div>
+      <Nav />
+      <div className="main-container">
+        <div className="heading-column-toggle-container">
+          <h1>Categories</h1>
+          <ColumnToggleDropdown
+            tableName="category"
+            columns={columns}
+            visibleColumns={visibleColumns}
+            setVisibleColumns={setVisibleColumns}
+          />
+        </div>
+
+        <div className="header-container">
+          {" "}
+          <div className="search-container">
+            <SearchIcon />{" "}
+            <input
+              type="text"
+              placeholder="Search category"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+            />
+          </div>
+          <button
+            onClick={() => {
+              navigate("/add-pincode");
+            }}
+          >
+            Create New Entry
+          </button>
+        </div>
+        <div>
+          <div className="table-product-container">
+            <table className="responsive-product-table">
+              <thead>
+                {columns.map((column) => (
+                  <th
+                    key={column.field}
+                    sx={{
+                      fontSize: 14, // Adjust the font size as needed
+                    }}
+                  >
+                    {column.headerName}
+                  </th>
+                ))}
+              </thead>
+              <tbody>
+                {data.map((row) => (
+                  <tr key={row._id}>
+                    <td>{row.stateName}</td>
+                    <td>{row.cityName}</td>
+
+                    <TableCell>
+                      <div className="icon-container">
+                        {/* <VisibilityIcon /> */}
+                        <EditIcon
+                          onClick={() => {
+                            navigate(`/edit-pincode/${row._id}`);
+                          }}
+                        />
+                        <DeleteIcon
+                          // onClick={async () => {
+                          //   await axios
+                          //     .delete(
+                          //       `https://selligo-backend.onrender.com/delete-pincode/${row._id}`
+                          //     )
+                          //     .then((res) => {
+                          //       toast.info("Deleted Successfully");
+                          //       fetchData();
+                          //     })
+                          //     .catch((err) => {
+                          //       alert("Server Error");
+                          //     });
+                          // }}
+                          onClick={() => {
+                            deletePincode(row._id);
+                          }}
+                        />
+                      </div>
+                    </TableCell>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="pagination-container">
+          <Pagination
+            count={Math.ceil(totalRows / pageSize)}
+            page={currentPage}
+            onChange={handlePageChange}
+            size="large"
+            color="primary"
+            showFirstButton
+            showLastButton
+            sx={{ mt: 2 }}
+          />
+          <div className="pagination-sub-container">
+            {" "}
+            <Select
+              value={pageSize}
+              onChange={handlePageSizeSelectChange}
+              variant="outlined"
+              style={{ marginLeft: "10px", height: "40px" }}
+            >
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={25}>25</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
+            <br />
+            <span>Total Items {totalRows}</span>
+          </div>
+        </div>
+      </div>
+      <DeleteConfirmationModal
+        isOpen={deleteConfirmation.isOpen}
+        handleClose={() =>
+          setDeleteConfirmation({ isOpen: false, pincodeId: null })
+        }
+        handleDelete={confirmDelete}
+      />
+      <ToastContainer />
+    </div>
+  );
+};
+
+export default ViewPinCode;

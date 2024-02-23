@@ -1,0 +1,30 @@
+.stats-container{
+    margin-top: 30px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap:50px;
+}
+
+.stats-card{
+    width: 20%;
+    height: 200px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.3s all ease-in-out;
+    cursor: pointer;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stats-count{
+    font-size:55px;
+}
+
+
+.stats-card:hover{
+    transform: scale(1.03);
+}

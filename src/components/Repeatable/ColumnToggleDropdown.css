@@ -1,0 +1,22 @@
+.column-toggle{
+    position: relative;
+}
+
+
+.dropdown-checkbox-container{
+    z-index: 2;
+    padding: 10px;
+    gap:10px;
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: max-content;
+}
+
+.column-toggle-option{
+    display: flex;
+    gap:5px;
+}
